@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="patient_admission_form" model="ir.ui.view">
+        <field name="name">hospital.hospital.form</field>
+        <field name="model">hospital.hospital</field>
+        <field name="arch" type="xml">
+            <form>
+<!--                <header>-->
+<!--                    <button name="assignWard" string="Allocate Ward" class="oe_highlight" type="object"-->
+<!--                            attrs="{'invisible':[('isAdmitted','=',True)]}"/>-->
+<!--                    <button name="DeAllocWard" string="Deallocate Ward" class="oe_highlight" type="object"-->
+<!--                            attrs="{'invisible':[('isAdmitted','=',False)]}"/>-->
+<!--                </header>-->
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+
+                    <group>
+                        <group><field name="disease"/></group>
+                        <group><field name="dateOfVisit"/></group>
+                    </group>
+
+                    <group>
+                        <field name="assignedDoctor"/>
+                    </group>
+                    <group>
+                        <group><field name="isAdmitted"/></group>
+                        <group><field name="AllotedRoomNo"/></group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                    <notebook>
+                        <page string="Personal Details">
+                            <group>
+                                <group><field name="gender"></field> </group>
+                                <group><field name="dateOfBirth"/></group>
+                                <group><field name="contactNumber"/></group>
+                                <group><field name="age" class="oe_read_only"/></group>
+                            </group>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="patient_admission_tree" model="ir.ui.view">
+        <field name="name">hospital.hospital.tree</field>
+        <field name="model">hospital.hospital</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="disease"/>
+                <field name="dateOfVisit"/>
+                <field name="AllotedRoomNo"/>
+                <field name="contactNumber"/>
+                <field name="assignedDoctor"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--KanBan View .. modify it later-->
+    <!--    <record id="patient_admission_kanban" model="ir.ui.view">
+            <field name="name">hospital.hospital.kanban</field>
+            <field name="model">hospital.hospital</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+
+                    <templates>
+                        <t t-name="kanban-box">
+                            <ul>
+                                <li><field name="name"/></li>
+                                <li><field name="gender"/></li>
+                                <li><field name="dateOfBirth"/></li>
+                                <li><field name="disease"/></li>
+                                <li><field name="dateOfVisit"/></li>
+                                <li><field name="contactNumber"/></li>
+                                <li><field name="assignedDoctor"/></li>
+                            </ul>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>-->
+
+    <record id="hospital_view_patients" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="res_model">hospital.hospital</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first patient</p>
+        </field>
+    </record>
+
+    <menuitem id="hospital_main_menu_root" name="Red Cross Hospital" sequence="-100"/>
+    <menuitem id="hospital_patient_root" name="Patients List" parent="hospital_main_menu_root"
+              action="hospital_view_patients"/>
+    <!--    <menuitem id="hospital_patient" name="Patients" parent="hospital_patient_root" action="hospital_view_patients"/>-->
+
+
+</odoo>

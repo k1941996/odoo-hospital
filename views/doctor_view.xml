@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="doctor_admission_form" model="ir.ui.view">
+        <field name="name">hospital.doctor.form</field>
+        <field name="model">hospital.doctors</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group><field name="name"/></group>
+                        <group><field name="dateOfBirth"/></group>
+                        <group><field name="specialization"/></group>
+
+                    </group>
+                    <notebook>
+                        <page string="Patients">
+                            <field name="patients"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+   <record id="doctor_admission_tree" model="ir.ui.view">
+      <field name="name">hospital.doctor.tree</field>
+      <field name="model">hospital.doctors</field>
+      <field name="arch" type="xml">
+         <tree>
+            <field name="name"/>
+         </tree>
+      </field>
+   </record>
+
+   <record id="hospital_view_doctors" model="ir.actions.act_window">
+        <field name="name">Doctors</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+        <field name="res_model">hospital.doctors</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enlist your first doctor!!</p>
+        </field>
+    </record>
+
+
+    <menuitem id="hospital_doctors_root" name="Doctors List" parent="hospital_main_menu_root" action="hospital_view_doctors"/>
+<!--   <menuitem id="hospital_doctor" name="Doctors" parent="hospital_doctors_root" action="hospital_view_doctors"/>-->
+</odoo>

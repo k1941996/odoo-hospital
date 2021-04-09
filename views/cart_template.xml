@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress OdooXml -->
+<odoo>
+
+
+    <template id="cart_lines_custom" inherit_id="website_sale.cart_lines" name="cart_line_template">
+        <xpath expr="//table[@id='cart_products']" position="replace">
+            <t t-call="hospital.custom_table"/>
+        </xpath>
+    </template>
+    <template id="custom_table">
+        <div class="container">
+            <div class="modal " id="myModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <div class="modal-header d-flex">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container">
+                                <div id="opening_balance_div" class="row m-2">
+                                    <label class="col w-25" for="opening_balance">Opening balance</label>
+                                    <input class="col" type="number" id="opening_balance"/>
+                                </div>
+                                <div id="seed_purchased_div" class="row m-2">
+                                    <label class="col w-25" for="seed_purchased">Seed Purchased</label>
+                                    <input class="col" type="number" id="seed_purchased"/>
+                                </div>
+                                <div id="tonnes_harvested_div" class="row m-2">
+                                    <label class="col w-25" for="tonnes_harvested">tonnes harvested</label>
+                                    <input class="col" type="number" id="tonnes_harvested"/>
+                                </div>
+                                <div id="qty_delivered_div" class="row m-2">
+                                    <label class="col w-25" for="qty_delivered">Qty Delivered</label>
+                                    <input class="col" type="number" id="qty_delivered"/>
+                                </div>
+                                <div id="other_div" class="row m-2">
+                                    <label class="col w-25" for="other">Other</label>
+                                    <input class="col" type="number" id="other"/>
+                                </div>
+                                <div id="qty_retained_div" class="row m-2">
+                                    <label class="col w-25" for="qty_retained">Qty retained</label>
+                                    <input class="col" type="number" id="qty_retained"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="form_submit_btn" data-dismiss="modal" class="btn btn-primary">Save changes</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div t-if="not website_sale_order or not website_sale_order.website_order_line" class="js_cart_lines alert alert-info">
+                Your cart is empty!
+            </div>
+            <table class="mb16 table table-striped table-sm js_cart_lines">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Variety</th>
+                        <th>Opening Balance</th>
+                        <th>Seed Purchased</th>
+                        <th>Tonnes Harvested</th>
+                        <th>Qty Delivered</th>
+                        <th>Other</th>
+                        <th>Qty Retained</th>
+                        <th>EPR Qty Payable</th>
+                        <th>EPR Rate</th>
+                        <th>Amount Payable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="website_sale_order.website_order_line" t-as="line">
+                        <tr>
+                            <td class="btn kshitij" data-toggle="modal" data-target="#myModal">
+                                <we-button class="fa fa-edit kshitij"/>
+                            </td>
+                            <td id='product_name'>
+                                <strong t-field="line.name_short"/>
+                            </td>
+                            <td id='opening_balance_td'>-</td>
+                            <td id='seed_purchased_td'>-</td>
+                            <td id='tonnes_harvested_td'>-</td>
+                            <td id='qty_delivered_td'>-</td>
+                            <td id='other_td'>-</td>
+                            <td id='qty_retained_td'>-</td>
+                            <td class="text-center td-qty">
+                                <div class="css_quantity input-group mx-auto">
+                                    <div class="input-group-prepend">
+                                        <a t-attf-href="#" class="btn btn-link js_add_cart_json d-none d-md-inline-block" aria-label="Remove one"
+                                           title="Remove one">
+                                            <i class="fa fa-minus"></i>
+                                        </a>
+                                    </div>
+                                    <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id"
+                                           t-att-data-product-id="line.product_id.id"
+                                           t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"/>
+                                    <div class="input-group-append">
+                                        <a t-attf-href="#" class="btn btn-link float_left js_add_cart_json d-none d-md-inline-block"
+                                           aria-label="Add one" title="Add one">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center td-price" name="price">
+                                <t t-set="combination"
+                                   t-value="line.product_id.product_template_attribute_value_ids + line.product_no_variant_attribute_value_ids"/>
+                                <t t-set="combination_info" t-value="line.product_id.product_tmpl_id._get_combination_info(combination)"/>
+
+                                <t t-set="list_price_converted"
+                                   t-value="website.currency_id._convert(combination_info['list_price'], website_sale_order.currency_id, website_sale_order.company_id, date)"/>
+                                <t groups="account.group_show_line_subtotals_tax_excluded"
+                                   t-if="(website_sale_order.pricelist_id.discount_policy == 'without_discount' and website_sale_order.currency_id.compare_amounts(list_price_converted, line.price_reduce_taxexcl) == 1) or website_sale_order.currency_id.compare_amounts(line.price_unit, line.price_reduce) == 1"
+                                   name="order_line_discount">
+                                    <del t-attf-class="#{'text-danger mr8'}" style="white-space: nowrap;" t-esc="list_price_converted"
+                                         t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
+                                </t>
+                                <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;"
+                                      t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"
+                                      groups="account.group_show_line_subtotals_tax_excluded"/>
+                                <t groups="account.group_show_line_subtotals_tax_included"
+                                   t-if="(website_sale_order.pricelist_id.discount_policy == 'without_discount' and website_sale_order.currency_id.compare_amounts(list_price_converted, line.price_reduce_taxinc) == 1) or website_sale_order.currency_id.compare_amounts(line.price_unit, line.price_reduce) == 1"
+                                   name="order_line_discount">
+                                    <del t-attf-class="#{'text-danger mr8'}" style="white-space: nowrap;" t-esc="list_price_converted"
+                                         t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
+                                </t>
+                                <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;"
+                                      t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"
+                                      groups="account.group_show_line_subtotals_tax_included"/>
+                            </td>
+                            <td id='amt_payable_td'>-</td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="cart_css" inherit_id="website.assets_frontend">
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript"
+                    src="/hospital/static/src/js/cart_table.js"/>
+        </xpath>
+    </template>
+
+</odoo>
